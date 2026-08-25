@@ -1,0 +1,20 @@
+# vizualisor.exe
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Fichiers de test
+*.test
+
+# Fichiers d'environnement (secrets)
+.env
+*.kdbx
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

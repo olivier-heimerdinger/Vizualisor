@@ -1,0 +1,73 @@
+# Vizualisor - Configuration
+# Ce fichier définit les serveurs à surveiller et les paramètres globaux.
+
+app:
+  name: "Vizualisor"
+  refresh_interval: 30  # secondes entre chaque actualisation
+  theme: "dark"         # dark ou light
+
+# Résolution des credentials (ordre de priorité)
+credentials:
+  # Fichier .env contenant USER_xxx et PASS_xxx
+  env_file: ".env"
+  # Base KeePass (optionnel)
+  keepass:
+    enabled: false
+    path: ""
+    # Le mot de passe maître sera demandé au lancement
+
+# Liste des serveurs à surveiller
+servers:
+  - name: "Production Web"
+    host: "192.168.1.10"
+    port: 22
+    username: "admin"
+    # password: "" # Utiliser .env ou KeePass de préférence
+    auth_method: "password"  # password, key
+    # key_path: "~/.ssh/id_rsa"
+    
+    # Logs spécifiques à ce serveur
+    custom_logs:
+      - name: "Nginx Access"
+        path: "/var/log/nginx/access.log"
+      - name: "Nginx Error"
+        path: "/var/log/nginx/error.log"
+      - name: "App Log"
+        path: "/var/log/myapp/app.log"
+    
+    # Commandes sudo personnalisées
+    sudo_commands:
+      - name: "Redémarrer Nginx"
+        command: "systemctl restart nginx"
+      - name: "Nettoyer les logs"
+        command: "journalctl --vacuum-time=7d"
+
+  - name: "Base de données"
+    host: "192.168.1.20"
+    port: 22
+    username: "dbadmin"
+    auth_method: "key"
+    key_path: "~/.ssh/id_rsa_db"
+    
+    custom_logs:
+      - name: "PostgreSQL"
+        path: "/var/log/postgresql/postgresql-15-main.log"
+    
+    sudo_commands:
+      - name: "Vacuum PostgreSQL"
+        command: "sudo -u postgres vacuumdb --all"
+
+# Services favoris (par serveur)
+favorites:
+  "Production Web":
+    - "nginx"
+    - "myapp"
+  "Base de données":
+    - "postgresql"
+
+# Règles d'alertes
+alerts:
+  enabled: true
+  poll_interval: 60  # secondes
+  # Alerter si ces services sont down
+  watch_favorites: true
